@@ -1,0 +1,91 @@
+% cahier.tex
+
+
+%le cahier des charges de son travail (en 5 pages maximum) :
+
+%4 formats de cartes? Les prod mapmedia ne sont pas des dev
+
+% - contexte qui décrit l'existant,
+\subsection{Description de l'existant}
+Pour produire ses cartes, la société \maxsea reçoit chaque année
+diverses livraisons de cartes au format S57. Ses deux principaux
+fournisseurs, \textit{Jeppesen} et \textit{Navionics}, livrent deux
+fois par an l'ensemble des cartes. Une seule de ces livraisons
+contient 45000 fichiers. Au début du stage la chaine de production des
+cartes au format dbv était localisé dans les locaux de
+l'entreprise. Le temps de transformation était cependant préoccupant,
+puisque les livraisons prenaient du retard. En effet, en utilisant les
+12 serveurs disponibles pour cette opération de production ,quatre
+mois étaient nécessaires au traitement d'une livraison.
+
+La chaine de production de cartes vecteurs est supervisée par le
+logiciel SSIS\,\footnote{SQL Server Integration Services} de
+\textit{Microsoft}. Une fois les données reçues, par DVD ou
+FTP\,\footnote{\textit{File Transfert Protocol}, Protocole de
+  transfert de fichiers}, un opérateur lance l'exécution de
+l'ETL\,\footnote{\textit{Extract Transform Load}, extraction
+  transformation alimentation} SSIS. Celui ci va lancer un par un les
+différents traitements qui seront nécessaires à la
+production. L'opérateur effectue différents contrôles plus ou moins
+automatisés, notamment à la fin de la création du catalogue. Durant ce
+processes les cartes sont manipulées sous forme de bases de données
+spatiales. Les opérations sur celles-ci se font principalement via
+FME\,\footnote{Logiciel propriétaire de SAFE SOFTWARE}, un ETL
+Spatial, qui s'appuit sur le Framework open source spatial
+\textit{GDal/OGR}.
+%ici un schéma des étapes de production
+
+% - description de la mission technique (travail à effectuer dans le
+% contexte de l'étude)
+\subsection{Mission Technique}
+Le stage consiste à déployer la chaine de production dans un
+environement de cloud computing. Ceci doit amener trois avantages à la
+société. Le premier et le plus important est de pouvoir produire les
+cartes dans le temps demandé. Ensuite vient la libération de
+ressources machine au sein des locaux et la baisse du prix de revient
+de la chaine de production vecteur.
+
+Les pistes explorées par Ronan GOLHEN mettent en avant l'offre de
+\textit{PaaS}\,\footnote{\textit{Plateform as a Service}, Plateforme
+  en tant que service} Azure de \textit{Microsoft}. Les
+caractéristiques principales de cette offre sont de libérer la société
+de la gestion des serveurs et de ne payer qu'à l'usage. Sa philosophie
+incite fortement aux modèles de calcul parallèle.
+
+Le stagiaire devra mettre en place une architecture logicielle
+permettant de traiter une partie ou l'ensemble de la production
+vecteur à l'intérieur du Cloud \textit{Microsoft}. Ce travail devra
+être exploitable par les opérateurs de \textit{MapMedia} sans
+apprentissage des technologies de developpement.
+
+
+
+
+%- moyens à mettre en œuvre.
+\subsection{Moyens à mettre en œuvre}
+Migrer la chaine de production demande une bonne connaissance des
+principes de workflow, de développement Azure et du Framework métier
+\textit{OGR}.
+
+ Le workflow est à reconsidérer, on ne peut pas juste copier la chaine
+ existante pour deux raisons principales. Tout d'abord le service
+ hébergeur est distant et on ne peut pas se permettre de controler
+ toute la production dans les locaux, ce qui impliquerait un
+ rapatriment des données entre chacune de ces étapes. Ensuite le
+ fait que la chaine utilise des logiciels propriétaires pose un
+ problème de licence car ils sont liés à une machine physique,
+ principe à bannir en terme de technologie cloud.
+
+Azure possède un Framework particulier qu'il faut maitriser. Par
+exemple les espaces de stockage permanent sont séparés des ressources
+physiques de la machine, qui elles, deviennent des ressources
+temporaires.
+
+ \textit{OGR} sera la principale alternative à FME. En effet on doit
+ pouvoir se passer de ce logiciel propriétaire et on peut se servir du
+ Framework qu'il utilise puisque ce dernier est open source. Il faut
+ donc recoder les étapes de production sans passer par l'intermédiaire
+ de FME.
+
+
+
