@@ -1,0 +1,227 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Lignes de conduites
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Lignes de conduites}
+
+Les pistes explorées par Ronan GOLHEN mettent en avant l'offre de
+\textit{PaaS}\,\footnote{\textit{Plateform as a Service}, Plateforme
+  en tant que service} Azure de \textit{Microsoft}. Les
+caractéristiques principales de cette offre sont de libérer la société
+de la gestion des serveurs et de ne payer qu'à l'usage. Sa philosophie
+incite fortement aux modèles de calcul parallèle. 
+%en effet on paye ici à l'utilisation, et non pour une période comme
+%avec l'entretient de machines
+
+
+Une architecture logicielle permettant de traiter une partie ou
+l'ensemble de la production vecteur à l'intérieur du Cloud
+\textit{Microsoft} doit être mise en place. Ce travail devra être
+exploitable par les opérateurs de \textit{MapMedia} sans apprentissage
+des technologies de developpement.
+
+
+%- moyens à mettre en œuvre.
+%\subsection{Moyens à mettre en œuvre}
+Migrer la chaine de production demande une bonne connaissance des
+principes de workflow, de développement Azure et du Framework métier
+\textit{OGR}.\\
+
+ Le workflow est à reconsidérer, on ne peut pas juste copier la chaine
+ existante pour deux raisons principales.
+
+Tout d'abord le service hébergeur est distant et on ne peut pas se
+permettre de controler toute la production dans les locaux, ce qui
+impliquerait un rapatriment des données entre chacune de ces étapes
+(plusieurs Giga-octets). 
+
+Ensuite le fait que la chaine utilise des logiciels propriétaires pose
+un problème de licence car ils sont liés à une machine physique,
+principe à bannir en terme de technologie cloud.  Nous avons contacté
+SAFE SOFTWARE, la société qui développe FME, cependant celle ci n'est
+pas près à fournir des licences payantes au nombre
+d'utilisateurs. Leur principe de licence prévoit que leur logiciel
+doit s'exécuter toujours sur la même machine, chose inenvisageable en
+univers cloud.\\
+
+
+Azure possède un Framework particulier qu'il faut maitriser. Par
+exemple les espaces de stockage permanent sont séparés des ressources
+physiques de la machine, qui elles, deviennent des ressources
+temporaires. Ainsi à chaque étape de calcul on sauvegarde les
+résultats dans des espaces de stockage persistant appelé Azure Blob.\\
+
+ \textit{OGR} sera la principale alternative à FME. En effet on doit
+ pouvoir se passer de ce logiciel propriétaire et on peut se servir du
+ Framework qu'il utilise puisque ce dernier est open source. Il a donc
+ fallut recoder les étapes de production sans passer par
+ l'intermédiaire de FME.\\
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Plateforme Azure
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Plus en Annexe ?
+
+\subsection{Services fournit par la plateforme \textit{Windows Azure}}
+Cette partie a pour but de familiariser le lecteur avec les conceptes
+que nous emploirons plus tard. Nous allons évoquer des services
+proposés par Microsoft.\\
+
+
+\subsubsection{Déploiement Azure}
+L'offre de \textit{PaaS} Azure s'appuit principalement sur le fait de
+déployer facilement des logiciels. Pour ce faire il faut développer un
+code qui serat zippé dans un fichier de binaire et ressources
+(extention \textit{.cspkg}) et un fichier de configuration (extention
+\textit{.cscfg}). Un fois ces deux fichiers uploadés, via le protail
+Azure\,\footnote{\textit{https://manage.windowsazure.com/}}, on peut
+gérer notre déployement. \\
+
+\subsubsection{Worker Roles}
+La cellule de base de l'architecture logicielle aportée est le Worker
+Role, autrement dit le rôle de travail. \\
+
+Lorsqu'on parle de worker role on fait souvent référence au code qui
+le compose. L'unité de travail dans le déployement Azure, qui
+correspond à ce worker role, est une instance de ce worker role.  On
+peut faire ici un parallèle avec un objet et une classe en
+POO\,\footnote{Programmation Orientée Objet}.\\
+
+
+Une implémentation de cette fonctionnalitée est fournit par
+l'API\,\footnote{\textit{http://msdn.microsoft.com/en-us/library/microsoft.windowsazure.serviceruntime.roleentrypoint\_members.aspx}}. Il
+sagit d'une classe, C\# dans notre cas, nommée RoleEntryPoint. On peut
+créer une classe héritant de celle ci et redéfinir les méthodes
+$OnStart()$, $Run()$ et $OnStop()$. La métheode la plus importante est
+la méthode $Run()$, on y met le code que l'on veut exécuter.\\
+
+Un worker role est cencé tourner en boucle, ceci sans jamais
+s'arrêter. Le processus peut tout de même s'intérompre dans des cas
+particuliers. Si l'utilisateur décide de stopper son déployement ou si
+le rôle est transférer sur une autre machine alors la méthode
+$OnStop()$ est appelée. Dans le cas d'un bug, bug du programme comme
+la monopolisations de toutes les ressources ou bug externe comme une
+coupure de courant, la méthode $OnStop()$ ne peut être appelée.\\
+
+Le processus correspondant à une instance d'un worker role est exécuté
+sur une VM\,\footnote{\textit{Virtual Machine}, Machine Virtuelle}
+spécialement montée pour lui. On dispose sur cette machine, en
+fonction des options de configuration, d'un certain espace mémoire et
+d'une certaine quantité de disque. Les données enregistrées sur le
+disque sont effacées avec l'intéruption de la VM, lors de l'arret de
+l'instance ou d'un disfonctionnement du serveur. De plus ces données
+sont local à l'instance, les autres instances ne peuvent y accéder.\\
+
+
+Pour pouvoir sauvegarder des résultats accéssibles par tous, autres
+instances d'un même déploiement et utilisateurs extérieurs, la
+plateforme Azure propose deux outils, l'Azure Storage et Azure SQL.
+On peut bien sur coder nos propores outils, qui upload les données des
+instances sur un serveur de l'entreprise par exemple. Cependant ces
+outils ont deux avantages majeurs. Ils sont déjà fait et sont situé
+sur des machines proches des VM, d'un point de vu géographique, ce qui
+augement considérablement la bande passante.\\
+
+
+\subsubsection{Azure Storage}
+Azure Storage est un espace de stockage de données numériques de
+grande capacité. On y trois services différents, les blobs, les queues et les tables.\\
+
+Les blobs sont des objets binaires non structurés, on peut les
+assimiler à des fichiers. Les queues sont des files
+FIFO\,\footnote{{First In First Out},Premier rentré premier sorti} de
+messages, texte ou binaires.Elles implémentent de nombreux mécanismes
+pérmétant de garentir la pérénité et la survie des messages. Les
+tables sont des conteneurs de données structurées, elle peuvent
+contenir de nombreux objet de petite taille.\\
+
+
+
+\subsubsection{Azure SQL}
+Azure SQL est un serveur SQL hébergé dans des machines proches des
+VM. Il sagit en réalité d'un SQL Server légèrement modifié.\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  Archi globale
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Architecture globale}
+Pour accompagner la construction du projet au niveau architecture
+logicielle deux réunions ont étées organisées avec des participants
+extérieurs à \maxsea. La première avec des responsables du
+\textit{MCIA}\,\footnote{\textit{Mésocentre de Calcul Intensif
+    Aquitain}} à surtout aboutit sur des considérations théorique sur
+le cloud computing. Ces personnes ont davantage l'habitude de
+travailler sur des offres \textit{IaaS} et sur des environnement
+UNIX. La seconde fut à Paris avec un expèrs en architecture Azure de
+Mircosoft France et deux employées de la société YSANCE, qui ont fait
+un projet semblable au notre. Cette dernière fut plus concrète car les
+participants avaient l'habitude de manipuler les API de Windows
+Azure. \\
+
+
+
+
+La solution apportée consiste en un déployement et donc en une
+solution C\# Visual Studio\,\footnote{\textit{IDE} (Integrated development
+  Environment) de Mircosoft.}.
+ %% WARGING !!  Besoin de le dire? Première fois que ça apparait ?
+
+
+
+
+\subsubsection{Classe \textit{WorkerRole}}
+La classe \textit{Worker Role} constitue le point d'entré du
+programme, elle hérite d'ailleurs de \textit{RoleEntryPoint}. Celle ci
+va instancier n threads de travail, puis va entrer dans une boucle
+infinie de surveillance de ces threads. La création de ces threads ce
+fait grace à la classe \textit{Thread}. Ils instancient une classe
+\textit{Worker}. La surveillance n'a pas était implémentée, elle
+consiste à vérifier qu'il n'y a pas de fuite mémoire, pour au besoin
+stopper ou relancer des threads de travail. 
+
+
+\subsubsection{Classe \textit{Worker}}
+La classe textit{Worker} sert à trouver et réépartir les tâches de
+travail. Dans son instanciation elle créé dynamiquement, en utilisant
+le .............. , un tableau de d'objet héritant de la classe
+abstraite \textit{BusinessProcess} et implémentant l'intérface
+\textit{IBusinessProcess}. Cette intérface demande d'implémenter deux
+méthodes, à savoir \textit{Init()} et \textit{Work()}. La seconde
+renvoie $false$ si l'objet ne trouve pas de travail et $true$ après
+avoir traité une tâche sinon. L'objet \textit{Worker} bouclera sur le
+tableau pour que toutes les tâches soit traitées.
+
+
+\subsubsection{Classes héritant de \textit{BusinessProcess}}
+Celles ci se comportent globalement de la même manière. Lors de son 
+instanciation ou de l'appel à \textit{Init()} un objet  elles mètent en place
+leur environement de travail, elles crééent notamment des chaines de
+connexion. Ensuite lors de l'appel à la méthode \textit{Work} elle
+
+
+\subsubsection{}
+\subsubsection{}
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Choix d'implé
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Détail de l'architecture et choix d'implémentation}
