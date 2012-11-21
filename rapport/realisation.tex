@@ -179,7 +179,7 @@ solution C\# Visual Studio\,\footnote{\textit{IDE} (Integrated development
 
 
 
-\subsubsection{Classe \textit{WorkerRole}}
+\subsubsection{La classe \textit{WorkerRole}}
 La classe \textit{Worker Role} constitue le point d'entré du
 programme, elle hérite d'ailleurs de \textit{RoleEntryPoint}. Celle ci
 va instancier n threads de travail, puis va entrer dans une boucle
@@ -190,7 +190,7 @@ consiste à vérifier qu'il n'y a pas de fuite mémoire, pour au besoin
 stopper ou relancer des threads de travail. 
 
 
-\subsubsection{Classe \textit{Worker}}
+\subsubsection{La classe \textit{Worker}}
 La classe textit{Worker} sert à trouver et réépartir les tâches de
 travail. Dans son instanciation elle créé dynamiquement, en utilisant
 le .............. , un tableau de d'objet héritant de la classe
@@ -202,14 +202,34 @@ avoir traité une tâche sinon. L'objet \textit{Worker} bouclera sur le
 tableau pour que toutes les tâches soit traitées.
 
 
-\subsubsection{Classes héritant de \textit{BusinessProcess}}
-Celles ci se comportent globalement de la même manière. Lors de son 
-instanciation ou de l'appel à \textit{Init()} un objet  elles mètent en place
-leur environement de travail, elles crééent notamment des chaines de
-connexion. Ensuite lors de l'appel à la méthode \textit{Work} elle
+\subsubsection{Les classes héritant de \textit{BusinessProcess}}
+Celles ci se comportent globalement de la même manière. Lors de son
+instanciation ou de l'appel à \textit{Init()} un objet héritant de
+\textit{BusinessProcess} met en place son environement de travail, et
+crée notamment des chaines de connexion. Ensuite lors de l'appel à la
+méthode \textit{Work} il vérifit si il a une tâche à faire. La plupart
+du temps la liste des tâche est implémenté grace à un objet
+\textit{CloudQueue} de l'API Azure. \\
+
+Si une tâche est trouvée alors la commande est interprétée à l'aide de
+la classe \textit{CommandLine} et les fichiers nécessaires sont
+ramenés des blobs Azure sur la VM (en local) afin de travaillé avec.\\
+
+Une fois cette étape de mise en place terminée, le code métier est
+appelé. Il écrit soit directement les résultats dans une table SQL
+Azure, soit dans un fichier qui sera ensuite remis dans un blob Azure.
+Enfin le message correspondant à la tâche est supprimé.
 
 
-\subsubsection{}
+\subsubsection{La classe \textit{Manager}}
+
+Dans un autre Worker Role nommé \textit{Manager}
+Afin de générer les milliers de messages envoyé aux queues de travail,
+un processus similaire à été mis en place. \\
+
+La classe \textit{} 
+
+
 \subsubsection{}
 
 
