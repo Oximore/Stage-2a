@@ -60,6 +60,33 @@ résultats dans des espaces de stockage persistant appelé Azure Blob.\\
  l'intermédiaire de FME.\\
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Archi globale ??
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{}
+
+% process générale pour produire des cartes
+
+
+
+\subsubsection{}
+
+\subsubsection{}
+
+\subsubsection{}
+
+
+
+
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   Plateforme Azure
@@ -223,14 +250,21 @@ Enfin le message correspondant à la tâche est supprimé.
 
 \subsubsection{La classe \textit{Manager}}
 
-Dans un autre Worker Role nommé \textit{Manager}
-Afin de générer les milliers de messages envoyé aux queues de travail,
-un processus similaire à été mis en place. \\
+Un autre Worker Role nommé \textit{Manager} sert à générer les
+milliers de messages envoyés aux queues de travail. C'est un processus
+similaire au premier. \\
 
-La classe \textit{} 
+La classe \textit{WorkerRole} sert de point d'entrée, mais cette fois
+il n'y a pas de thread de travail et de thread de
+surveillance. L'objet instancira directement un tableau de d'objet
+héritant de \textit{Manager} et implémentant l'intérface
+\textit{IManager}. Il boucle ensuite sur ce tableau pour savoir si il
+existe des taches à effectuer. Ces taches sont différentes des
+précédente puisqu'il s'agit de créer des messages et de remplire des
+queux.
 
 
-\subsubsection{}
+%\subsubsection{}
 
 
 
@@ -245,3 +279,13 @@ La classe \textit{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Détail de l'architecture et choix d'implémentation}
+Nous allons ici aborder les différents choix technique
+d'implémentation. %Point par point.
+
+\subsubsection{}
+
+\subsubsection{}
+
+\subsubsection{}
+
+\subsubsection{}
