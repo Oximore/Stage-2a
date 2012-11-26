@@ -1,10 +1,49 @@
 
-Voici une liste, plus ou moins exaustive, des améliorations possible
-voir souhaitable du prototype proposé.
-
-\subsection{Todo-List}
+Voici une liste, plus ou moins exaustive, des améliorations possibles,
+voir souhaitables, du prototype proposé.
 
 
+\subsection{Amélioration de la fiabilité}
 
+\begin{itemize}
+\item[] Des tests à grande échelle sont à faire pour pouvoir détecter
+  d'éventuels problème dans la production. 
+\item[] Des étapes de traitement spécifiques au fournisseurs sont à
+  faire (ex: lignes roses d'avionics).
+\item[] Le cas spécial des SOUNDG est à traiter dans le
+  \textit{DisplayStyler}.
+\item[] Implémenter la surveillance des threads de calcul.
+\item[] Implémenter les log du \textit{DisplayStyler}.
+\item[] Gestion des nom en UTF16 avec Ogr.
+\end{itemize}
+
+\subsection{Amélioration des performances}
+
+
+\begin{itemize}
+\item[] Remplacer toutes les communications synchrone par des
+  communications non-bloquantes/asynchrones.
+\item[] Faire du recouvrement calcul/communication.
+\item[] Optimiser l'écriture en BD, si possible.
+\item[] Lancer les Worker role dès le premier fichier s57 uploadé.
+\item[] S'interser aux index des BD.
+\item[] Implémenter un deuxième worker role pour la copie (taille de
+  machine différente).
+\item[] S'intereser aux tables azure (non SQL).
+\end{itemize}
+
+\subsection{Amélioration de l'éxpérience opérateur}
+\begin{itemize}
+\item[] Implémenter la chaine de production en entier (tables
+  CATALOGUE\_RCL\_ALL, ...)
+\item[] Enchainer les étapes de manière automatique entre les
+  post-productions.
+\item[] Implémenter une interface spécifique (Web, SSIS, ...).
+\item[] Automatiser l'interuption d'une production.
+\end{itemize}
+
+
+
+%\subsection{Amélioration}
 %%\subsection{Historique} %% ??
-\subsection{Conclusion}
+\section{Conclusion}
