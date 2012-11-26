@@ -10,7 +10,9 @@ Les pistes explorées par Ronan GOLHEN mettent en avant l'offre de
 \textit{PaaS}\,\footnote{\textit{Plateform as a Service}, Plateforme
   en tant que service} Azure de \textit{Microsoft}. Les
 caractéristiques principales de cette offre sont de libérer la société
-de la gestion des serveurs et de ne payer qu'à l'usage. Sa philosophie
+de la gestion des serveurs et de ne payer qu'à l'usage, contrairement
+aux offres \textit{IaaS}\,\footnote{\textit{Infrastructure as a
+    Service}, Infrastructure en tant que Service}. Sa philosophie
 incite fortement aux modèles de calcul parallèle.
 %en effet on paye ici à l'utilisation, et non pour une période comme
 %avec l'entretient de machines
@@ -29,8 +31,8 @@ Migrer la chaine de production demande une bonne connaissance des
 principes de workflow, de développement Azure et du Framework métier
 \textit{OGR}.\\
 
- Le workflow est à reconsidérer, on ne peut pas juste copier la chaine
- existante pour deux raisons principales.
+Le workflow est à reconsidérer, on ne peut pas juste copier la chaine
+existante pour deux raisons principales.
 
 Tout d'abord le service hébergeur est distant et on ne peut pas se
 permettre de controler toute la production dans les locaux, ce qui
@@ -61,51 +63,6 @@ résultats dans des espaces de stockage persistant appelé Azure Blob.\\
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%   Archi globale ??
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Procédure de génération de cartes}
-
-Pour produire les cartes au format dbv, l'opérateur utilisant la
-solution crée pendant le stage doit faire quelques manipulations. \\
-
-Il doit commencer par générer des tables SQL avec l'ancien système
-(CATALOGUE\_RCL\_ALL, MX\_CHART, ...). Il les migre ensuite sur un
-serveur \textit{SQL Azure}, grace au logiciel \textit{SQL Database
-  Migration Wizard}\,\footnote{Logiciel gratuit de migration de base
-  de donnée, disponible sur sqlazuremw.codeplex.com}. De même grâce à
-des logiciels comme \textit{Azure Storage Exploreur} ou
-\textit{CloudBerry} les datas d'entré, les cartes au format .s57, sont
-placées dans des Blobs Azure.\\
-
-Après avoir préparé un espace de travail azure, il déploie la solution
-sur le Cloud Azure. Une fois les instances de travail opérationnelles,
-il peut utiliser les différents scripts, fichiers .bat, mis à sa
-disposition pour exécuter les différentes étapes de la création du
-dbv. Dans l'ordre ces étapes se nomment : Reprojection, MainProduction,
-PostProduction1, PostProduction2 et Copie.\\
-
-Enfin, il récupère les résultats obtenus (fichier dbv) à partir d'un
-blob azure.
-
-% process générale pour produire des cartes
-
-
-
-%\subsubsection{}
-
-%\subsubsection{}
-
-%\subsubsection{}
-
-
-
-
-
-
 
 
 
@@ -121,7 +78,7 @@ blob azure.
 \subsection{Services fournit par la plateforme \textit{Windows Azure}}
 Cette partie a pour but de familiariser le lecteur avec les concepts
 Azure que nous emploirons plus tard. Nous allons évoquer des services
-proposés par Microsoft.\\
+proposés par \textit{Microsoft}.\\
 
 
 \subsubsection{Déploiement Azure}
@@ -199,6 +156,70 @@ contenir de nombreux objet de petite taille.\\
 \subsubsection{Azure SQL}
 Azure SQL est un serveur SQL hébergé dans des machines proches des
 VM. Il sagit en réalité d'un SQL Server légèrement modifié.\\
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Archi globale ??
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Procédure de génération de cartes}
+
+Pour produire les cartes au format dbv, l'opérateur utilisant la
+solution crée pendant le stage doit faire quelques manipulations. \\
+
+Il doit commencer par générer des tables SQL avec l'ancien système
+(CATALOGUE\_RCL\_ALL, MX\_CHART, ...). Il les migre ensuite sur un
+serveur \textit{SQL Azure}, grace au logiciel \textit{SQL Database
+  Migration Wizard}\,\footnote{Logiciel gratuit de migration de base
+  de donnée, disponible sur sqlazuremw.codeplex.com}. De même grâce à
+des logiciels comme \textit{Azure Storage Exploreur} ou
+\textit{CloudBerry} les datas d'entrés, les cartes au format .s57, sont
+placées dans des Blobs Azure.\\
+
+Après avoir préparé un espace de travail azure, il déploie la solution
+sur le Cloud Azure. Une fois les instances de travail opérationnelles,
+il peut utiliser les différents scripts, fichiers .bat, mis à sa
+disposition pour exécuter les différentes étapes de la création du
+dbv. Dans l'ordre ces étapes se nomment : Reprojection, MainProduction,
+PostProduction1, PostProduction2 et Copie.\\
+
+Enfin, il récupère les résultats obtenus (fichier dbv) à partir d'un
+blob azure.
+
+% process générale pour produire des cartes
+
+
+
+%\subsubsection{}
+
+%\subsubsection{}
+
+%\subsubsection{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  Archi globale
