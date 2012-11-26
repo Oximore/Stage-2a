@@ -11,7 +11,7 @@ Les pistes explorées par Ronan GOLHEN mettent en avant l'offre de
   en tant que service} Azure de \textit{Microsoft}. Les
 caractéristiques principales de cette offre sont de libérer la société
 de la gestion des serveurs et de ne payer qu'à l'usage. Sa philosophie
-incite fortement aux modèles de calcul parallèle. 
+incite fortement aux modèles de calcul parallèle.
 %en effet on paye ici à l'utilisation, et non pour une période comme
 %avec l'entretient de machines
 
@@ -67,17 +67,39 @@ résultats dans des espaces de stockage persistant appelé Azure Blob.\\
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{}
+\subsection{Procédure de génération de cartes}
+
+Pour produire les cartes au format dbv, l'opérateur utilisant la
+solution crée pendant le stage doit faire quelques manipulations. \\
+
+Il doit commencer par générer des tables SQL avec l'ancien système
+(CATALOGUE\_RCL\_ALL, MX\_CHART, ...). Il les migre ensuite sur un
+serveur \textit{SQL Azure}, grace au logiciel \textit{SQL Database
+  Migration Wizard}\,\footnote{Logiciel gratuit de migration de base
+  de donnée, disponible sur sqlazuremw.codeplex.com}. De même grâce à
+des logiciels comme \textit{Azure Storage Exploreur} ou
+\textit{CloudBerry} les datas d'entré, les cartes au format .s57, sont
+placées dans des Blobs Azure.\\
+
+Après avoir préparé un espace de travail azure, il déploie la solution
+sur le Cloud Azure. Une fois les instances de travail opérationnelles,
+il peut utiliser les différents scripts, fichiers .bat, mis à sa
+disposition pour exécuter les différentes étapes de la création du
+dbv. Dans l'ordre ces étapes se nomment : Reprojection, MainProduction,
+PostProduction1, PostProduction2 et Copie.\\
+
+Enfin, il récupère les résultats obtenus (fichier dbv) à partir d'un
+blob azure.
 
 % process générale pour produire des cartes
 
 
 
-\subsubsection{}
+%\subsubsection{}
 
-\subsubsection{}
+%\subsubsection{}
 
-\subsubsection{}
+%\subsubsection{}
 
 
 
@@ -97,8 +119,8 @@ résultats dans des espaces de stockage persistant appelé Azure Blob.\\
 %% Plus en Annexe ?
 
 \subsection{Services fournit par la plateforme \textit{Windows Azure}}
-Cette partie a pour but de familiariser le lecteur avec les conceptes
-que nous emploirons plus tard. Nous allons évoquer des services
+Cette partie a pour but de familiariser le lecteur avec les concepts
+Azure que nous emploirons plus tard. Nous allons évoquer des services
 proposés par Microsoft.\\
 
 
@@ -162,9 +184,12 @@ Azure Storage est un espace de stockage de données numériques de
 grande capacité. On y trois services différents, les blobs, les queues et les tables.\\
 
 Les blobs sont des objets binaires non structurés, on peut les
-assimiler à des fichiers. Les queues sont des files
+assimiler à des fichiers. Ils sont regroupés dans des contenaires. On
+peut assimiler les blobs à des fichiers et les contenaires à des
+dossiers dans un système de fichier; à la différence qu'un contenaire
+ne peut pas posséder de contenaire. Les queues sont des files
 FIFO\,\footnote{{First In First Out},Premier rentré premier sorti} de
-messages, texte ou binaires.Elles implémentent de nombreux mécanismes
+messages, texte ou binaires.Elles implémentent plusieurs mécanismes
 pérmétant de garentir la pérénité et la survie des messages. Les
 tables sont des conteneurs de données structurées, elle peuvent
 contenir de nombreux objet de petite taille.\\
@@ -181,7 +206,7 @@ VM. Il sagit en réalité d'un SQL Server légèrement modifié.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subsection{Architecture globale}
+\subsection{Détail de l'architecture et choix d'implémentation}%Architecture globale}
 Pour accompagner la construction du projet au niveau architecture
 logicielle deux réunions ont étées organisées avec des participants
 extérieurs à \maxsea. La première avec des responsables du
@@ -228,6 +253,11 @@ renvoie $false$ si l'objet ne trouve pas de travail et $true$ après
 avoir traité une tâche sinon. L'objet \textit{Worker} bouclera sur le
 tableau pour que toutes les tâches soit traitées.
 
+\begin{figure}[h!]
+  \caption{Diagramme de classe partiel du Worker Role.}
+  \centering
+    \includegraphics[width=0.8\textwidth]{images/WorkerRole.png}
+\end{figure}
 
 \subsubsection{Les classes héritant de \textit{BusinessProcess}}
 Celles ci se comportent globalement de la même manière. Lors de son
@@ -247,7 +277,11 @@ appelé. Il écrit soit directement les résultats dans une table SQL
 Azure, soit dans un fichier qui sera ensuite remis dans un blob Azure.
 Enfin le message correspondant à la tâche est supprimé.
 
-
+\begin{figure}[h!]
+  \caption{Diagramme des classes héritant de BusinessProduction.}
+  \centering
+    \includegraphics[width=0.8\textwidth]{images/BusinessProduction2.png}
+\end{figure}
 \subsubsection{La classe \textit{Manager}}
 
 Un autre Worker Role nommé \textit{Manager} sert à générer les
@@ -263,6 +297,12 @@ existe des taches à effectuer. Ces taches sont différentes des
 précédente puisqu'il s'agit de créer des messages et de remplire des
 queux.
 
+\begin{figure}[h!]
+  \caption{Diagramme de classe du Worker Role Manager.}
+  \centering
+    \includegraphics[width=0.8\textwidth]{images/Manager.png}
+\end{figure}
+
 
 %\subsubsection{}
 
@@ -274,18 +314,203 @@ queux.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Choix d'implé
+% Travail métier
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Détail de l'architecture et choix d'implémentation}
-Nous allons ici aborder les différents choix technique
-d'implémentation. %Point par point.
+\subsection{Détail des tâches métiers}
+Nous allons ici aborder fonctionalitées métier. \\ Elles se séparent
+en 3 catégories. Les premières peuvent s'éxécuter en parallèle par
+carte, les secondes par RCL\,\footnote{\textit{Row Column Level},
+  Ligne Colone Niveau, méthode d'agencement en "quadtree
+  pyramid"}. Pour la dernière catégorie le parallèlisme est moins
+évident à mètre en place. \\
 
-\subsubsection{}
+%A là fin d'une tâche, un message peut être automatiquement générer
+%pour la suivante en mettant l'option "fullProduction" à $true$.
 
-\subsubsection{}
+\subsubsection{La classe \textit{Reprojection}}
+Message d'entrée : 
+-inputcontainer:\textless \textit{input\_container\_name}\textgreater \   
+-inputfile:\textless \textit{input\_file\_name}\textgreater \ 
+[-outputContainer:\textless \textit{output\_container\_name} \textgreater ]\  
+[-outputfile:\textless \textit{output\_file\_name}\textgreater ] \ 
+[-fullProduction: $\{true;false\}$] \ 
+-serveur:\textless \textit{server\_name}\textgreater \   
+-dataBase:\textless \textit{data\_base\_name}\textgreater \   
+-user:\textless \textit{user\_name}\textgreater  \ 
+-pwd:\textless \textit{password}\textgreater  \ 
+[-overwrite:$\{true;false\}$] \ 
+[-update:$\{true;false\}$] \ 
+-refFournisseur:\textless \textit{int\_provider}\textgreater \\   
 
-\subsubsection{}
+Au départ d'une production nous possédons des fichiers .s57 dans un
+contenaire et des tables dans une base de donnée SQL azure.  \\
 
-\subsubsection{}
+Le fichier .s57 est ouvert avec l'API Ogr. Chaque lignes de la base de
+donnée est ensuite recopié dans un fichier sqlite en reprojetant
+chaque coordonée spatialle dans un autre référenciel spatial. Les
+tables OBJECT\_TYPE, PROVIDER\_REFERENCE, CHART\_FID, CHART et
+S57\_OBJECT sont crées et les trois premières remplies. Le résultat
+est stocké dans un blob.
+
+
+\subsubsection{La classe \textit{MainProduction}}
+Message d'entrée : 
+-inputcontainer:\textless \textit{input\_container\_name}\textgreater \   
+-inputfile:\textless \textit{input\_file\_name}\textgreater \ 
+[-outputContainer:\textless \textit{output\_container\_name} \textgreater ]\  
+[-outputfile:\textless \textit{output\_file\_name}\textgreater ] \ 
+-serveur:\textless \textit{server\_name}\textgreater \   
+-dataBase:\textless \textit{data\_base\_name}\textgreater \   
+-user:\textless \textit{user\_name}\textgreater  \ 
+-pwd:\textless \textit{password}\textgreater  \ 
+[-overwrite:$\{true;false\}$] \ 
+[-update:$\{true;false\}$] \ 
+[-jobToDo:{clipping;trinagulation;display3d}] \ 
+[-layers:{all;\textless \textit{layers\_names} \textgreater} ] \\ 
+
+Le fichier précédent est modifié par cette classe. Les géométries des
+objets sont découpée, on parlera par la suite de clipping, selon la
+table CATALOGUE\_RCL\_ALL et placée dans la table
+CLIPPING\_OBJECT. Les géométries de type polygones obtenues sont
+triangulées en utilisant les bibliothèques j3d\,\footnote{Java 3d, dll
+  wrapée} et stocké dans la table TRIANGULATION\_2D. Enfin on calcul
+un point d'affichage pour chaque géométrie, un sorte de barycentre
+pour l'affichage. Ce résultat est distribué dans les tables
+DISPLAY\_3D, DISPLAY\_3D\_POLYGONE, DISPLAY\_3D\_LINE.
+
+
+
+
+\subsubsection{La classe \textit{PostProduction1}}
+Message d'entrée : 
+-inputcontainer:\textless \textit{input\_container\_name}\textgreater \   
+-inputfile:\textless \textit{input\_file\_name}\textgreater \ 
+[-outputContainer:\textless \textit{output\_container\_name} \textgreater ]\  
+[-outputfile:\textless \textit{output\_file\_name}\textgreater ] \ 
+[-fullProduction: $\{true;false\}$] \ 
+-serveur:\textless \textit{server\_name}\textgreater \   
+-dataBase:\textless \textit{data\_base\_name}\textgreater \   
+-user:\textless \textit{user\_name}\textgreater  \ 
+-pwd:\textless \textit{password}\textgreater  \ 
+[-overwrite:$\{true;false\}$] \ 
+[-update:$\{true;false\}$] \\ 
+
+Dans les deux post-production le système de traitement d'une tache est
+un peu plus complexe car on fait appèl à un exécutable, le
+\textit{displayStyler}, qui est une version modifié pour l'occasion,
+d'un code déjà existant et fonctionel de l'entreprise. L'intégration
+de ce code directement dans le code produit durant le stage pose des
+problèmes de compatibilité de framework Microsoft. C'est pourquoi le
+choix de modifier les sources de l'exécutable pour qu'il manipule lui
+même les objets azure a été fait.\\
+
+La première post-production travail encore par carte. Elle remplie les
+tables CHART et S57\_OBJECTS avec des binaires représentant les
+données des objets découpés.
+
+
+\subsubsection{La classe \textit{PostProduction2}}
+Message d'entrée : 
+-inputcontainer:\textless \textit{input\_container\_name}\textgreater \   
+-inputfile:\textless \textit{input\_file\_name}\textgreater \ 
+[-outputContainer:\textless \textit{output\_container\_name} \textgreater ]\  
+[-outputfile:\textless \textit{output\_file\_name}\textgreater ] \ 
+[-fullProduction: $\{true;false\}$] \ 
+-serveur:\textless \textit{server\_name}\textgreater \   
+-dataBase:\textless \textit{data\_base\_name}\textgreater \   
+-user:\textless \textit{user\_name}\textgreater  \ 
+-pwd:\textless \textit{password}\textgreater  \ 
+[-overwrite:$\{true;false\}$] \ 
+[-update:$\{true;false\}$] \ 
+-refFournisseur:\textless \textit{int\_provider}\textgreater \   
+[-jobToDo:{clipping;trinagulation;display3d}] \ 
+[-layers:{all;\textless \textit{layers\_names} \textgreater} ] \\
+
+La seconde post-production travaille par RCL, ce qui oblige à
+télécharger toutes les cartes sqlite du RCL. Une petite particularité
+afin d'alléger les tables SQL Azure, ici les des binaires générés sont
+stockés dans des blob azure et leur référence sont insérés dans les
+tables RCL et S52\_RCL. Ces deux tables ne sont plus dans un fichier
+sqlite mais bien sur SQL Azure afin de pouvoir gérer le parallèlisme à
+gros grain facilement.
+
+\subsubsection{La classe \textit{Copie}}
+Message d'entrée : 
+-inputcontainer:\textless \textit{input\_container\_name}\textgreater \   
+-inputfile:\textless \textit{input\_file\_name}\textgreater \ 
+[-outputContainer:\textless \textit{output\_container\_name} \textgreater ]\  
+[-outputfile:\textless \textit{output\_file\_name}\textgreater ] \ 
+[-fullProduction: $\{true;false\}$] \ 
+-serveur:\textless \textit{server\_name}\textgreater \   
+-dataBase:\textless \textit{data\_base\_name}\textgreater \   
+-user:\textless \textit{user\_name}\textgreater  \ 
+-pwd:\textless \textit{password}\textgreater  \ 
+[-overwrite:$\{true;false\}$] \ 
+[-update:$\{true;false\}$] \ 
+-refFournisseur:\textless \textit{int\_provider}\textgreater \   
+[-jobToDo:{clipping;trinagulation;display3d}] \ 
+[-layers:{all;\textless \textit{layers\_names} \textgreater} ] \\
+
+La dernière étape n'est pas parallèlisé. Elle s'apuie encore sur le
+\textit{DisplayStyler}. Elle consiste grossièrement à regrouper tous
+les résultats précédent en un seul fichier.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Résultat
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Résultats}
+
+\subsubsection{Fichier au format dbv}
+
+Un fichier dbv crée par la nouvelle chaine de production a put être
+lu par le logiciel MaxSea TimeZero. La migrtion de la chaine de
+production est donc techniquement possible. Seul bémole à cet essai,
+par manque de temps un seul rcl a été traité. Même si de nombreuses
+étapes ont étées testé en quantité (jusqu'à la post-production2), un
+plus gros lots de rcl et de carte pour la copie aurai été souhaitable.
+
+\begin{figure}[h!]
+  \caption{Rendu dans MaxSeaTZ d'un RCL produit sur le Could.}
+  \centering
+    \includegraphics[width=0.8\textwidth]{images/rcl_L10_R799_C146.png}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Perf
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\subsection{Pérformances}
+
+%Nous allons ici aborder les différents choix technique
+%d'implémentation. %Point par point.
+
+\subsubsection{Pérformance de travail}
+La performance n'as pas été le facteur décisif.  Cependant on peu dire
+qu'on bénéficie avec ce système d'une bonne accélération, ou speed-up,
+même si l'algo est loin d'être optimal. En effet trop de temps est
+perdu dans les communications, en particulier dans le téléchargement
+de fichiers sqlite. On remarque que, comme attendu, le temps de
+production d'un lot donné est inversement linéaire au nombre de worker
+role, du moins pour les premières étapes où des tests ont étés
+effectués.
+
+\subsubsection{Budgétaires}
+La question du coût reste assez floue. En effet on ne peut pas faire
+de comparratif entre l'ancien système et les coût de la production
+cloud. Nous ne disposons pas d'une estimation du coût annuel de
+l'infrastructure dédiée à la production vecteur car ces machines sont
+utilisée pour de nombreuses fonctions simultanément. De plus seul un
+essai grandeur nature de bout en bout peut vraiment nous donner le
+coût d'une production vecteur en environement cloud.
+
+
