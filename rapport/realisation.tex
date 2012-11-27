@@ -22,7 +22,7 @@ Une architecture logicielle permettant de traiter une partie ou
 l'ensemble de la production vecteur à l'intérieur du Cloud
 \textit{Microsoft} doit être mise en place. Ce travail devra être
 exploitable par les opérateurs de \textit{MapMedia} sans apprentissage
-des technologies de developpement.
+des technologies de développement.
 
 
 %- moyens à mettre en œuvre.
@@ -45,11 +45,11 @@ principe à bannir en terme de technologie cloud.  Nous avons contacté
 SAFE SOFTWARE, la société qui développe FME, cependant celle ci n'est
 pas près à fournir des licences payantes au nombre
 d'utilisateurs. Leur principe de licence prévoit que leur logiciel
-doit s'exécuter toujours sur la même machine, chose inenvisageable en
+doit s'exécuter toujours sur la même machine, chose inadaptée pour un
 univers cloud.\\
 
 
-Azure possède un Framework particulier qu'il faut maitriser. Par
+Azure possède un Framework particulier qu'il faut maîtriser. Par
 exemple les espaces de stockage permanent sont séparés des ressources
 physiques de la machine, qui elles, deviennent des ressources
 temporaires. Ainsi à chaque étape de calcul on sauvegarde les
@@ -58,7 +58,7 @@ résultats dans des espaces de stockage persistant appelé Azure Blob.\\
  \textit{OGR} sera la principale alternative à FME. En effet on doit
  pouvoir se passer de ce logiciel propriétaire et on peut se servir du
  Framework qu'il utilise puisque ce dernier est open source. Il a donc
- fallut recoder les étapes de production sans passer par
+ fallut refaire les étapes de production sans passer par
  l'intermédiaire de FME.\\
 
 
@@ -77,25 +77,25 @@ résultats dans des espaces de stockage persistant appelé Azure Blob.\\
 
 \subsection{Services fournit par la plateforme \textit{Windows Azure}}
 Cette partie a pour but de familiariser le lecteur avec les concepts
-Azure que nous emploirons plus tard. Nous allons évoquer des services
+Azure que nous emploierons plus tard. Nous allons évoquer des services
 proposés par \textit{Microsoft}.\\
 
 
 \subsubsection{Déploiement Azure}
 L'offre de \textit{PaaS} Azure s'appuit principalement sur le fait de
 déployer facilement des logiciels. Pour ce faire il faut développer un
-code qui serat zippé dans un fichier de binaire et ressources
+code qui sera zippé dans un fichier de binaire et ressources
 (extention \textit{.cspkg}) et un fichier de configuration (extention
-\textit{.cscfg}). Un fois ces deux fichiers uploadés, via le protail
+\textit{.cscfg}). Un fois ces deux fichiers uploadés, via le portail
 Azure\,\footnote{\textit{https://manage.windowsazure.com/}}, on peut
-gérer notre déployement. \\
+gérer notre déploiement. \\
 
 \subsubsection{Worker Roles}
-La cellule de base de l'architecture logicielle aportée est le Worker
+La cellule de base de l'architecture logicielle apportée est le Worker
 Role, autrement dit le rôle de travail. \\
 
 Lorsqu'on parle de worker role on fait souvent référence au code qui
-le compose. L'unité de travail dans le déployement Azure, qui
+le compose. L'unité de travail dans le déploiement Azure, qui
 correspond à ce worker role, est une instance de ce worker role.  On
 peut faire ici un parallèle avec un objet et une classe en
 POO\,\footnote{Programmation Orientée Objet}.\\
@@ -103,42 +103,52 @@ POO\,\footnote{Programmation Orientée Objet}.\\
 
 Une implémentation de cette fonctionnalitée est fournit par
 l'API\,\footnote{\textit{http://msdn.microsoft.com/en-us/library/microsoft.windowsazure.serviceruntime.roleentrypoint\_members.aspx}}. Il
-sagit d'une classe, C\# dans notre cas, nommée RoleEntryPoint. On peut
-créer une classe héritant de celle ci et redéfinir les méthodes
-$OnStart()$, $Run()$ et $OnStop()$. La métheode la plus importante est
-la méthode $Run()$, on y met le code que l'on veut exécuter.\\
+s'agit d'une classe, C\# dans notre cas, nommée
+\textit{RoleEntryPoint}. On peut créer une classe héritant de celle-ci
+et redéfinir les méthodes $OnStart()$, $Run()$ et $OnStop()$. La
+méthode la plus importante est la méthode $Run()$, on y met le code
+que l'on veut exécuter.\\
 
-Un worker role est cencé tourner en boucle, ceci sans jamais
-s'arrêter. Le processus peut tout de même s'intérompre dans des cas
-particuliers. Si l'utilisateur décide de stopper son déployement ou si
-le rôle est transférer sur une autre machine alors la méthode
+Un worker role est censé tourner en boucle, ceci sans jamais
+s'arrêter. Le processus peut tout de même s'interrompre dans des cas
+particuliers. Si l'utilisateur décide de stopper son déploiement ou si
+le rôle est transféré sur une autre machine alors la méthode
 $OnStop()$ est appelée. Dans le cas d'un bug, bug du programme comme
-la monopolisations de toutes les ressources ou bug externe comme une
+la monopolisation de toutes les ressources ou bug externe comme une
 coupure de courant, la méthode $OnStop()$ ne peut être appelée.\\
 
 Le processus correspondant à une instance d'un worker role est exécuté
 sur une VM\,\footnote{\textit{Virtual Machine}, Machine Virtuelle}
 spécialement montée pour lui. On dispose sur cette machine, en
 fonction des options de configuration, d'un certain espace mémoire et
-d'une certaine quantité de disque. Les données enregistrées sur le
-disque sont effacées avec l'intéruption de la VM, lors de l'arret de
-l'instance ou d'un disfonctionnement du serveur. De plus ces données
-sont local à l'instance, les autres instances ne peuvent y accéder.\\
+d'une certaine quantité de mémoire disque. Les données enregistrées
+sur le disque sont effacées avec l'interruption de la VM, lors de
+l'arrêt de l'instance ou d'un dysfonctionnement du serveur. De plus
+ces données sont locales à l'instance, les autres instances ne peuvent y
+accéder.\\
+
+%% TODO TODO TODO %%
+%% TODO TODO TODO %%
+%% TODO TODO TODO %%
+%% TODO TODO TODO %%
+%% TODO TODO TODO %%
 
 
-Pour pouvoir sauvegarder des résultats accéssibles par tous, autres
-instances d'un même déploiement et utilisateurs extérieurs, la
-plateforme Azure propose deux outils, l'Azure Storage et Azure SQL.
-On peut bien sur coder nos propores outils, qui upload les données des
-instances sur un serveur de l'entreprise par exemple. Cependant ces
-outils ont deux avantages majeurs. Ils sont déjà fait et sont situé
-sur des machines proches des VM, d'un point de vu géographique, ce qui
-augement considérablement la bande passante.\\
+Pour pouvoir sauvegarder des résultats accessibles par tous, y compris
+pour les autres instances d'un même déploiement et utilisateurs
+extérieurs, la plateforme Azure propose deux outils, l'Azure Storage
+et Azure SQL.  On peut bien sur coder nos propres outils, qui upload
+les données des instances sur un serveur de l'entreprise par
+exemple. Cependant ces outils ont deux avantages majeurs. Ils sont
+déjà fait et sont situés sur des machines proches des VM, d'un point
+de vue géographique, ce qui augement considérablement la bande
+passante.\\
 
 
 \subsubsection{Azure Storage}
 Azure Storage est un espace de stockage de données numériques de
-grande capacité. On y trois services différents, les blobs, les queues et les tables.\\
+grande capacité. On y trouve trois services différents, les blobs, les
+queues et les tables.\\
 
 Les blobs sont des objets binaires non structurés, on peut les
 assimiler à des fichiers. Ils sont regroupés dans des contenaires. On
@@ -146,16 +156,16 @@ peut assimiler les blobs à des fichiers et les contenaires à des
 dossiers dans un système de fichier; à la différence qu'un contenaire
 ne peut pas posséder de contenaire. Les queues sont des files
 FIFO\,\footnote{{First In First Out},Premier rentré premier sorti} de
-messages, texte ou binaires.Elles implémentent plusieurs mécanismes
-pérmétant de garentir la pérénité et la survie des messages. Les
-tables sont des conteneurs de données structurées, elle peuvent
-contenir de nombreux objet de petite taille.\\
+messages, texte ou binaire. Elles implémentent plusieurs mécanismes
+pérmettant de garantir la pérénité et la survie des messages. Les
+tables sont des containers de données structurées, elle peuvent
+contenir de nombreux objets de petite taille.\\
 
 
 
 \subsubsection{Azure SQL}
 Azure SQL est un serveur SQL hébergé dans des machines proches des
-VM. Il sagit en réalité d'un SQL Server légèrement modifié.\\
+VM. Il s'agit en réalité d'un SQL Server légèrement modifié.\\
 
 
 
@@ -168,7 +178,7 @@ VM. Il sagit en réalité d'un SQL Server légèrement modifié.\\
 \subsection{Procédure de génération de cartes}
 
 Pour produire les cartes au format dbv, l'opérateur utilisant la
-solution crée pendant le stage doit faire quelques manipulations. \\
+solution créée pendant le stage doit faire quelques manipulations. \\
 
 Il doit commencer par générer des tables SQL avec l'ancien système
 (CATALOGUE\_RCL\_ALL, MX\_CHART, ...). Il les migre ensuite sur un
@@ -176,10 +186,10 @@ serveur \textit{SQL Azure}, grace au logiciel \textit{SQL Database
   Migration Wizard}\,\footnote{Logiciel gratuit de migration de base
   de donnée, disponible sur sqlazuremw.codeplex.com}. De même grâce à
 des logiciels comme \textit{Azure Storage Exploreur} ou
-\textit{CloudBerry} les datas d'entrés, les cartes au format .s57, sont
+\textit{CloudBerry} les datas d'entrées, les cartes au format .s57, sont
 placées dans des Blobs Azure.\\
 
-Après avoir préparé un espace de travail azure, il déploie la solution
+Après avoir préparé un espace de travail Azure, il déploie la solution
 sur le Cloud Azure. Une fois les instances de travail opérationnelles,
 il peut utiliser les différents scripts, fichiers .bat, mis à sa
 disposition pour exécuter les différentes étapes de la création du
@@ -187,7 +197,7 @@ dbv. Dans l'ordre ces étapes se nomment : Reprojection, MainProduction,
 PostProduction1, PostProduction2 et Copie.\\
 
 Enfin, il récupère les résultats obtenus (fichier dbv) à partir d'un
-blob azure.
+blob Azure.
 
 % process générale pour produire des cartes
 
@@ -229,14 +239,14 @@ blob azure.
 
 \subsection{Détail de l'architecture et choix d'implémentation}%Architecture globale}
 Pour accompagner la construction du projet au niveau architecture
-logicielle deux réunions ont étées organisées avec des participants
+logicielle deux réunions ont été organisées avec des participants
 extérieurs à \maxsea. La première avec des responsables du
 \textit{MCIA}\,\footnote{\textit{Mésocentre de Calcul Intensif
-    Aquitain}} à surtout aboutit sur des considérations théorique sur
+    Aquitain}} a surtout abouti sur des considérations théoriques sur
 le cloud computing. Ces personnes ont davantage l'habitude de
-travailler sur des offres \textit{IaaS} et sur des environnement
-UNIX. La seconde fut à Paris avec un expèrs en architecture Azure de
-Mircosoft France et deux employées de la société YSANCE, qui ont fait
+travailler sur des offres \textit{IaaS} et sur des environnements
+UNIX. La seconde fut à Paris avec un expert en architecture Azure de
+Mircosoft France et deux employés de la société YSANCE, qui ont fait
 un projet semblable au notre. Cette dernière fut plus concrète car les
 participants avaient l'habitude de manipuler les API de Windows
 Azure. \\
@@ -244,9 +254,9 @@ Azure. \\
 
 
 
-La solution apportée consiste en un déployement et donc en une
+La solution apportée consiste en un déploiement et donc en une
 solution C\# Visual Studio\,\footnote{\textit{IDE} (Integrated development
-  Environment) de Mircosoft.}.
+  Environment) de \textit{Mircosoft}.}.
  %% WARGING !!  Besoin de le dire? Première fois que ça apparait ?
 
 
@@ -254,25 +264,25 @@ solution C\# Visual Studio\,\footnote{\textit{IDE} (Integrated development
 
 \subsubsection{La classe \textit{WorkerRole}}
 La classe \textit{Worker Role} constitue le point d'entré du
-programme, elle hérite d'ailleurs de \textit{RoleEntryPoint}. Celle ci
+programme, elle hérite d'ailleurs de \textit{RoleEntryPoint}. Celle-ci
 va instancier n threads de travail, puis va entrer dans une boucle
-infinie de surveillance de ces threads. La création de ces threads ce
+infinie de surveillance de ces threads. La création de ces threads se
 fait grace à la classe \textit{Thread}. Ils instancient une classe
-\textit{Worker}. La surveillance n'a pas était implémentée, elle
+\textit{Worker}. La surveillance n'a pas été implémentée, elle
 consiste à vérifier qu'il n'y a pas de fuite mémoire, pour au besoin
-stopper ou relancer des threads de travail. 
+stopper ou relancer des threads de travail.
 
 
 \subsubsection{La classe \textit{Worker}}
-La classe textit{Worker} sert à trouver et réépartir les tâches de
+La classe \textit{Worker} sert à trouver et répartir les tâches de
 travail. Dans son instanciation elle créé dynamiquement, en utilisant
-le .............. , un tableau de d'objet héritant de la classe
-abstraite \textit{BusinessProcess} et implémentant l'intérface
-\textit{IBusinessProcess}. Cette intérface demande d'implémenter deux
+la réflexivité, un tableau d'objet héritant de la classe
+abstraite \textit{BusinessProcess} et implémentant l'interface
+\textit{IBusinessProcess}. Cette interface demande d'implémenter deux
 méthodes, à savoir \textit{Init()} et \textit{Work()}. La seconde
 renvoie $false$ si l'objet ne trouve pas de travail et $true$ après
 avoir traité une tâche sinon. L'objet \textit{Worker} bouclera sur le
-tableau pour que toutes les tâches soit traitées.
+tableau pour que toutes les tâches soient traitées.
 
 \begin{figure}[h!]
   \caption{Diagramme de classe partiel du Worker Role.}
@@ -281,17 +291,17 @@ tableau pour que toutes les tâches soit traitées.
 \end{figure}
 
 \subsubsection{Les classes héritant de \textit{BusinessProcess}}
-Celles ci se comportent globalement de la même manière. Lors de son
+Celles-ci se comportent globalement de la même manière. Lors de son
 instanciation ou de l'appel à \textit{Init()} un objet héritant de
 \textit{BusinessProcess} met en place son environement de travail, et
 crée notamment des chaines de connexion. Ensuite lors de l'appel à la
-méthode \textit{Work} il vérifit si il a une tâche à faire. La plupart
-du temps la liste des tâche est implémenté grace à un objet
+méthode \textit{Work} il vérifie si il a une tâche à faire. La plupart
+du temps la liste des tâches est implémentées gràce à un objet
 \textit{CloudQueue} de l'API Azure. \\
 
-Si une tâche est trouvée alors la commande est interprétée à l'aide de
+Si une tâche est trouvée alors la commande est interpretée à l'aide de
 la classe \textit{CommandLine} et les fichiers nécessaires sont
-ramenés des blobs Azure sur la VM (en local) afin de travaillé avec.\\
+ramenés des blobs Azure sur la VM (en local) afin de travailler avec.\\
 
 Une fois cette étape de mise en place terminée, le code métier est
 appelé. Il écrit soit directement les résultats dans une table SQL
@@ -311,12 +321,12 @@ similaire au premier. \\
 
 La classe \textit{WorkerRole} sert de point d'entrée, mais cette fois
 il n'y a pas de thread de travail et de thread de
-surveillance. L'objet instancira directement un tableau de d'objet
-héritant de \textit{Manager} et implémentant l'intérface
+surveillance. L'objet instanciera directement un tableau d'objet
+héritant de \textit{Manager} et implémentant l'interface
 \textit{IManager}. Il boucle ensuite sur ce tableau pour savoir si il
-existe des taches à effectuer. Ces taches sont différentes des
-précédente puisqu'il s'agit de créer des messages et de remplire des
-queux.
+existe des tâches à effectuer. Ces tâches sont différentes des
+précédentes puisqu'il s'agit de créer des messages et de remplir des
+queues.
 
 \begin{figure}[h!]
   \caption{Diagramme de classe du Worker Role Manager.}
@@ -340,12 +350,12 @@ queux.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Détail des tâches métiers}
-Nous allons ici aborder fonctionalitées métier. \\ Elles se séparent
-en 3 catégories. Les premières peuvent s'éxécuter en parallèle par
-carte, les secondes par RCL\,\footnote{\textit{Row Column Level},
-  Ligne Colone Niveau, méthode d'agencement en "quadtree
-  pyramid"}. Pour la dernière catégorie le parallèlisme est moins
-évident à mètre en place. \\
+Nous allons ici aborder les fonctionalitées métier. \\ Elles se
+séparent en 3 catégories. Les premières peuvent s'exécuter en
+parallèle par carte, les secondes par RCL\,\footnote{\textit{Row
+    Column Level}, Ligne Colone Niveau, méthode d'agencement en
+  "quadtree pyramid"}. Pour la dernière catégorie le parallèlisme est
+moins évident à mettre en place. \\
 
 %A là fin d'une tâche, un message peut être automatiquement générer
 %pour la suivante en mettant l'option "fullProduction" à $true$.
@@ -366,11 +376,11 @@ Message d'entrée :
 -refFournisseur:\textless \textit{int\_provider}\textgreater \\   
 
 Au départ d'une production nous possédons des fichiers .s57 dans un
-contenaire et des tables dans une base de donnée SQL azure.  \\
+container et des tables dans une base de donnée SQL Azure.  \\
 
-Le fichier .s57 est ouvert avec l'API Ogr. Chaque lignes de la base de
-donnée est ensuite recopié dans un fichier sqlite en reprojetant
-chaque coordonée spatialle dans un autre référenciel spatial. Les
+Le fichier .s57 est ouvert avec l'API Ogr. Chaque ligne de la base de
+donnée est ensuite recopiée dans un fichier sqlite en reprojetant
+chaque coordonnée spatiale dans un autre référenciel spatial. Les
 tables OBJECT\_TYPE, PROVIDER\_REFERENCE, CHART\_FID, CHART et
 S57\_OBJECT sont crées et les trois premières remplies. Le résultat
 est stocké dans un blob.
@@ -392,12 +402,12 @@ Message d'entrée :
 [-layers:{all;\textless \textit{layers\_names} \textgreater} ] \\ 
 
 Le fichier précédent est modifié par cette classe. Les géométries des
-objets sont découpée, on parlera par la suite de clipping, selon la
-table CATALOGUE\_RCL\_ALL et placée dans la table
-CLIPPING\_OBJECT. Les géométries de type polygones obtenues sont
+objets sont découpées, on parlera par la suite de clipping, selon la
+table CATALOGUE\_RCL\_ALL et placées dans la table
+CLIPPING\_OBJECT. Les géométries de type polygone obtenues sont
 triangulées en utilisant les bibliothèques j3d\,\footnote{Java 3d, dll
-  wrapée} et stocké dans la table TRIANGULATION\_2D. Enfin on calcul
-un point d'affichage pour chaque géométrie, un sorte de barycentre
+  wrapée} et stockées dans la table TRIANGULATION\_2D. Enfin on calcul
+un point d'affichage pour chaque géométrie, une sorte de barycentre
 pour l'affichage. Ce résultat est distribué dans les tables
 DISPLAY\_3D, DISPLAY\_3D\_POLYGONE, DISPLAY\_3D\_LINE.
 
@@ -418,14 +428,14 @@ Message d'entrée :
 [-overwrite:$\{true;false\}$] \ 
 [-update:$\{true;false\}$] \\ 
 
-Dans les deux post-production le système de traitement d'une tache est
-un peu plus complexe car on fait appèl à un exécutable, le
-\textit{displayStyler}, qui est une version modifié pour l'occasion,
-d'un code déjà existant et fonctionel de l'entreprise. L'intégration
+Dans les deux post-productions le système de traitement d'une tâche
+est un peu plus complexe car on fait appel à un exécutable, le
+\textit{displayStyler}, qui est une version modifiée pour l'occasion,
+d'un code déjà existant et fonctionnel de l'entreprise. L'intégration
 de ce code directement dans le code produit durant le stage pose des
 problèmes de compatibilité de framework Microsoft. C'est pourquoi le
-choix de modifier les sources de l'exécutable pour qu'il manipule lui
-même les objets azure a été fait.\\
+choix de modifier les sources de l'exécutable pour qu'il manipule
+lui-même les objets Azure a été fait.\\
 
 La première post-production travail encore par carte. Elle remplie les
 tables CHART et S57\_OBJECTS avec des binaires représentant les
@@ -451,8 +461,8 @@ Message d'entrée :
 
 La seconde post-production travaille par RCL, ce qui oblige à
 télécharger toutes les cartes sqlite du RCL. Une petite particularité
-afin d'alléger les tables SQL Azure, ici les des binaires générés sont
-stockés dans des blob azure et leur référence sont insérés dans les
+afin d'alléger les tables SQL Azure, ici les binaires générés sont
+stockés dans des blob Azure et leurs références sont insérées dans les
 tables RCL et S52\_RCL. Ces deux tables ne sont plus dans un fichier
 sqlite mais bien sur SQL Azure afin de pouvoir gérer le parallèlisme à
 gros grain facilement.
@@ -474,16 +484,16 @@ Message d'entrée :
 [-jobToDo:{clipping;trinagulation;display3d}] \ 
 [-layers:{all;\textless \textit{layers\_names} \textgreater} ] \\
 
-La dernière étape n'est pas parallèlisé. Elle s'apuie encore sur le
+La dernière étape n'est pas parallèlisé. Elle s'appuie encore sur le
 \textit{DisplayStyler}. Elle consiste grossièrement à regrouper tous
-les résultats précédent en un seul fichier.
+les résultats précédents en un seul fichier.
 
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Résultat
+% Résultat 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
