@@ -1,50 +1,63 @@
 
-Voici une liste, plus ou moins exaustive, des améliorations possibles,
-voir souhaitables, du prototype proposé.
+Voici une liste, plus ou moins exhaustive, des améliorations
+possibles, voir souhaitables, du prototype proposé.
 
 
 \subsection{Amélioration de la fiabilité}
 
 \begin{itemize}
 \item[] Des tests à grande échelle sont à faire pour pouvoir détecter
-  d'éventuels problème dans la production. 
-\item[] Des étapes de traitement spécifiques au fournisseurs sont à
-  faire (ex: lignes roses d'avionics).
+  d'éventuels problèmes dans la production. 
+\item[] Des étapes de traitement spécifique au fournisseur sont à
+  faire (ex: lignes roses d'Avionics).
 \item[] Le cas spécial des SOUNDG est à traiter dans le
   \textit{DisplayStyler}.
 \item[] Implémenter la surveillance des threads de calcul.
 \item[] Implémenter les log du \textit{DisplayStyler}.
-\item[] Gestion des nom en UTF16 avec Ogr.
+\item[] Gestion des noms en UTF16 avec Ogr.
 \end{itemize}
 
 \subsection{Amélioration des performances}
 
-
 \begin{itemize}
-\item[] Remplacer toutes les communications synchrone par des
+\item[] Remplacer toutes les communications synchrones par des
   communications non-bloquantes/asynchrones.
 \item[] Faire du recouvrement calcul/communication.
 \item[] Optimiser l'écriture en BD, si possible.
 \item[] Lancer les Worker role dès le premier fichier s57 uploadé.
-\item[] S'interser aux index des BD.
+\item[] S'intéresser aux index des BD.
 \item[] Implémenter un deuxième worker role pour la copie (taille de
   machine différente).
-\item[] S'intereser aux tables azure (non SQL).
+\item[] S'intéresser aux tables azure (non SQL).
 \end{itemize}
 
-\subsection{Amélioration de l'éxpérience opérateur}
+\subsection{Amélioration de l'expérience opérateur}
+
 \begin{itemize}
 \item[] Implémenter la chaine de production en entier (tables
   CATALOGUE\_RCL\_ALL, ...)
 \item[] Enchainer les étapes de manière automatique entre les
   post-productions.
 \item[] Implémenter une interface spécifique (Web, SSIS, ...).
-\item[] Automatiser l'interuption d'une production.
+\item[] Automatiser l'interruption d'une production.
 \end{itemize}
 
 
 
 %\subsection{Amélioration}
 %%\subsection{Historique} %% ??
-\section{Conclusion}
+\section{Bilan}
+Ce premier prototype prouve que la réalisation de cartes vectorielles,
+pour le logiciel MaxSea Time Zero, en environnement cloud est
+possible.  La faisabilité étant démontrée, il reste à examiner les
+facteurs humains et économiques pour décider de la réalisation d'une
+production plus aboutie.\\
+
+Ce prototype veut résoudre le problème du manque de temps par la
+solution du cloud computing. D'autres solutions comme la
+parallèlisation à grain fin pour une production en local nécessitant
+moins de ressources temporelles, ou encore une version hybride couplée
+à une offre de PaaS, n'ont pas été envisagées.
+
+
 % Remerciments ?

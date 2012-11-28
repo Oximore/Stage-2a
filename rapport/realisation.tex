@@ -42,8 +42,8 @@ impliquerait un rapatriment des données entre chacune de ces étapes
 Ensuite le fait que la chaine utilise des logiciels propriétaires pose
 un problème de licence car ils sont liés à une machine physique,
 principe à bannir en terme de technologie cloud.  Nous avons contacté
-SAFE SOFTWARE, la société qui développe FME, cependant celle ci n'est
-pas près à fournir des licences payantes au nombre
+SAFE SOFTWARE, la société qui développe FME, cependant celle-ci n'est
+pas prête à fournir des licences payantes au nombre
 d'utilisateurs. Leur principe de licence prévoit que leur logiciel
 doit s'exécuter toujours sur la même machine, chose inadaptée pour un
 univers cloud.\\
@@ -141,7 +141,7 @@ et Azure SQL.  On peut bien sur coder nos propres outils, qui upload
 les données des instances sur un serveur de l'entreprise par
 exemple. Cependant ces outils ont deux avantages majeurs. Ils sont
 déjà fait et sont situés sur des machines proches des VM, d'un point
-de vue géographique, ce qui augement considérablement la bande
+de vue géographique, ce qui augmente considérablement la bande
 passante.\\
 
 
@@ -151,13 +151,13 @@ grande capacité. On y trouve trois services différents, les blobs, les
 queues et les tables.\\
 
 Les blobs sont des objets binaires non structurés, on peut les
-assimiler à des fichiers. Ils sont regroupés dans des contenaires. On
-peut assimiler les blobs à des fichiers et les contenaires à des
-dossiers dans un système de fichier; à la différence qu'un contenaire
-ne peut pas posséder de contenaire. Les queues sont des files
+assimiler à des fichiers. Ils sont regroupés dans des containers. On
+peut assimiler les blobs à des fichiers et les containers à des
+dossiers dans un système de fichier; à la différence qu'un container
+ne peut pas posséder de containers. Les queues sont des files
 FIFO\,\footnote{{First In First Out},Premier rentré premier sorti} de
-messages, texte ou binaire. Elles implémentent plusieurs mécanismes
-pérmettant de garantir la pérénité et la survie des messages. Les
+messages, textes ou binaires. Elles implémentent plusieurs mécanismes
+permettant de garantir la pérénité et la survie des messages. Les
 tables sont des containers de données structurées, elle peuvent
 contenir de nombreux objets de petite taille.\\
 
@@ -182,7 +182,7 @@ solution créée pendant le stage doit faire quelques manipulations. \\
 
 Il doit commencer par générer des tables SQL avec l'ancien système
 (CATALOGUE\_RCL\_ALL, MX\_CHART, ...). Il les migre ensuite sur un
-serveur \textit{SQL Azure}, grace au logiciel \textit{SQL Database
+serveur \textit{SQL Azure}, grâce au logiciel \textit{SQL Database
   Migration Wizard}\,\footnote{Logiciel gratuit de migration de base
   de donnée, disponible sur sqlazuremw.codeplex.com}. De même grâce à
 des logiciels comme \textit{Azure Storage Exploreur} ou
@@ -263,11 +263,11 @@ solution C\# Visual Studio\,\footnote{\textit{IDE} (Integrated development
 
 
 \subsubsection{La classe \textit{WorkerRole}}
-La classe \textit{Worker Role} constitue le point d'entré du
+La classe \textit{Worker Role} constitue le point d'entrée du
 programme, elle hérite d'ailleurs de \textit{RoleEntryPoint}. Celle-ci
 va instancier n threads de travail, puis va entrer dans une boucle
 infinie de surveillance de ces threads. La création de ces threads se
-fait grace à la classe \textit{Thread}. Ils instancient une classe
+fait grâce à la classe \textit{Thread}. Ils instancient une classe
 \textit{Worker}. La surveillance n'a pas été implémentée, elle
 consiste à vérifier qu'il n'y a pas de fuite mémoire, pour au besoin
 stopper ou relancer des threads de travail.
@@ -293,7 +293,7 @@ tableau pour que toutes les tâches soient traitées.
 \subsubsection{Les classes héritant de \textit{BusinessProcess}}
 Celles-ci se comportent globalement de la même manière. Lors de son
 instanciation ou de l'appel à \textit{Init()} un objet héritant de
-\textit{BusinessProcess} met en place son environement de travail, et
+\textit{BusinessProcess} met en place son environnement de travail, et
 crée notamment des chaines de connexion. Ensuite lors de l'appel à la
 méthode \textit{Work} il vérifie si il a une tâche à faire. La plupart
 du temps la liste des tâches est implémentées gràce à un objet
@@ -321,7 +321,7 @@ similaire au premier. \\
 
 La classe \textit{WorkerRole} sert de point d'entrée, mais cette fois
 il n'y a pas de thread de travail et de thread de
-surveillance. L'objet instanciera directement un tableau d'objet
+surveillance. L'objet instanciera directement un tableau d'objets
 héritant de \textit{Manager} et implémentant l'interface
 \textit{IManager}. Il boucle ensuite sur ce tableau pour savoir si il
 existe des tâches à effectuer. Ces tâches sont différentes des
@@ -349,8 +349,8 @@ queues.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Détail des tâches métiers}
-Nous allons ici aborder les fonctionalitées métier. \\ Elles se
+\subsection{Détails des tâches métiers}
+Nous allons ici aborder les fonctionnalités métiers. \\ Elles se
 séparent en 3 catégories. Les premières peuvent s'exécuter en
 parallèle par carte, les secondes par RCL\,\footnote{\textit{Row
     Column Level}, Ligne Colone Niveau, méthode d'agencement en
@@ -382,7 +382,7 @@ Le fichier .s57 est ouvert avec l'API Ogr. Chaque ligne de la base de
 donnée est ensuite recopiée dans un fichier sqlite en reprojetant
 chaque coordonnée spatiale dans un autre référenciel spatial. Les
 tables OBJECT\_TYPE, PROVIDER\_REFERENCE, CHART\_FID, CHART et
-S57\_OBJECT sont crées et les trois premières remplies. Le résultat
+S57\_OBJECT sont créées et les trois premières remplies. Le résultat
 est stocké dans un blob.
 
 
@@ -484,7 +484,7 @@ Message d'entrée :
 [-jobToDo:{clipping;trinagulation;display3d}] \ 
 [-layers:{all;\textless \textit{layers\_names} \textgreater} ] \\
 
-La dernière étape n'est pas parallèlisé. Elle s'appuie encore sur le
+La dernière étape n'est pas parallèlisée. Elle s'appuie encore sur le
 \textit{DisplayStyler}. Elle consiste grossièrement à regrouper tous
 les résultats précédents en un seul fichier.
 
@@ -501,12 +501,12 @@ les résultats précédents en un seul fichier.
 
 \subsubsection{Fichier au format dbv}
 
-Un fichier dbv crée par la nouvelle chaine de production a put être
-lu par le logiciel MaxSea TimeZero. La migrtion de la chaine de
+Un fichier dbv crée par la nouvelle chaine de production a pu être
+lu par le logiciel MaxSea TimeZero. La migration de la chaine de
 production est donc techniquement possible. Seul bémole à cet essai,
 par manque de temps un seul rcl a été traité. Même si de nombreuses
-étapes ont étées testé en quantité (jusqu'à la post-production2), un
-plus gros lots de rcl et de carte pour la copie aurai été souhaitable.
+étapes ont été testées en quantité (jusqu'à la post-production2), un
+plus gros lots de rcl et de cartes pour la copie aurait été souhaitable.
 
 \begin{figure}[h!]
   \caption{Rendu dans MaxSeaTZ d'un RCL produit sur le Could.}
@@ -525,24 +525,24 @@ plus gros lots de rcl et de carte pour la copie aurai été souhaitable.
 %Nous allons ici aborder les différents choix technique
 %d'implémentation. %Point par point.
 
-\subsubsection{Pérformance de travail}
-La performance n'as pas été le facteur décisif.  Cependant on peu dire
+\subsubsection{Performance de travail}
+La performance n'a pas été le facteur décisif. Cependant on peut dire
 qu'on bénéficie avec ce système d'une bonne accélération, ou speed-up,
-même si l'algo est loin d'être optimal. En effet trop de temps est
-perdu dans les communications, en particulier dans le téléchargement
-de fichiers sqlite. On remarque que, comme attendu, le temps de
-production d'un lot donné est inversement linéaire au nombre de worker
-role, du moins pour les premières étapes où des tests ont étés
-effectués.
+même si l'algorithme est loin d'être optimal. En effet trop de temps
+est perdu dans les communications, en particulier dans le
+téléchargement de fichiers sqlite. On remarque que, comme attendu, le
+temps de production d'un lot donné est inversement proportionnel au
+nombre de worker role, du moins pour les premières étapes pour
+lesquelles des tests ont été effectués.
 
 \subsubsection{Budgétaires}
 La question du coût reste assez floue. En effet on ne peut pas faire
-de comparratif entre l'ancien système et les coût de la production
-cloud. Nous ne disposons pas d'une estimation du coût annuel de
-l'infrastructure dédiée à la production vecteur dans les locaux de
-\maxsea car ces machines sont utilisées pour de nombreuses fonctions
-simultanément. De plus seul un essai grandeur nature de bout en bout
-peut vraiment nous donner le coût d'une production vecteur en
-environement cloud.
+de comparatif entre les coûts de l'ancien système et ceux de la
+production cloud. Nous ne disposons pas d'une estimation du coût
+annuel de l'infrastructure dédiée à la production vecteur dans les
+locaux de \maxsea car ces machines sont utilisées pour de nombreuses
+fonctions simultanément. De plus seul un essai grandeur nature de bout
+en bout peut vraiment nous donner le coût d'une production vecteur en
+environnement cloud.
 
 
